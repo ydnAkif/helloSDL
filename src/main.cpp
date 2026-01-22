@@ -1,4 +1,5 @@
 // main.cpp
+
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
@@ -18,33 +19,43 @@ SDL_Texture *LoadTexture(SDL_Renderer *renderer, const char *path) {
     return texture;
 }
 
-TTF_Font *LoadFont(const char *path, int size) {
+TTF_Font *LoadFont(const char *path, const int size) {
     TTF_Font *font = TTF_OpenFont(path, static_cast<float>(size));
-    if (!font) {
+    if (!font)
         SDL_Log("Failed to load font '%s': %s", path, SDL_GetError());
-    }
     return font;
 }
 
-SDL_Texture *CreateTextTexture(SDL_Renderer *renderer, TTF_Font *font, const char *text, size_t len, SDL_Color color,
-                               SDL_FRect &outRect, float centerX, float y) {
+SDL_Texture *CreateTextTexture(SDL_Renderer *renderer,
+                               TTF_Font *font,
+                               const char *text,
+                               const size_t len,
+                               const SDL_Color color,
+                               SDL_FRect &outRect,
+                               const float centerX,
+                               const float y) {
     SDL_Surface *surface = TTF_RenderText_Blended(font, text, len, color);
+
     if (!surface) {
         SDL_Log("Text rendering failed: %s", SDL_GetError());
         return nullptr;
     }
+
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+
     outRect = {
         centerX - static_cast<float>(surface->w) / 2.0f,
         y,
         static_cast<float>(surface->w),
         static_cast<float>(surface->h)
     };
+
     SDL_DestroySurface(surface);
+
     return texture;
 }
 
-int main(int argc, char *argv[]) {
+int main() {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
         return 1;
@@ -75,7 +86,7 @@ int main(int argc, char *argv[]) {
 
     float texW = 0, texH = 0;
     SDL_GetTextureSize(logo, &texW, &texH);
-    SDL_FRect logoRect = {
+    const SDL_FRect logoRect = {
         WINDOW_WIDTH / 2.0f - (texW * LOGO_SCALE) / 2.0f,
         WINDOW_HEIGHT / 2.0f - (texH * LOGO_SCALE) / 2.0f,
         texW * LOGO_SCALE,
@@ -112,8 +123,8 @@ int main(int argc, char *argv[]) {
                 running = false;
             } else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
                 SDL_FPoint clickPoint = {
-                    static_cast<float>(event.button.x),
-                    static_cast<float>(event.button.y)
+                    (event.button.x),
+                    (event.button.y)
                 };
 
                 if (showLogo && SDL_PointInRectFloat(&clickPoint, &logoRect)) {
@@ -151,5 +162,6 @@ int main(int argc, char *argv[]) {
     SDL_DestroyWindow(window);
     TTF_Quit();
     SDL_Quit();
+
     return 0;
 }
